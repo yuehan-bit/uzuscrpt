@@ -288,7 +288,7 @@ misc_folder:AddToggle({text = "Auto Execute", state = config.auto_execute, callb
     config.auto_execute = v
     save()
     if not v then return end
-    queue_on_teleport('https://raw.githubusercontent.com/yuehan-bit/uzuscript/refs/heads/main/uzu.lua"))()')
+    queue_on_teleport('https://raw.githubusercontent.com/yuehan-bit/uzuscrpt/refs/heads/main/uzuscrpt.lua"))()')
 end})
 
 misc_folder:AddToggle({text = "Auto Rejoin", state = config.auto_rejoin, callback = function(v)
