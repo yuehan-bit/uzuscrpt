@@ -186,7 +186,7 @@ end
 
 function auto_farm_mob()
 	while task.wait() and config.auto_farm_mob do
-        local mob = get_nearest()
+        local mob = get_nearest_mob()
         if not mob then continue end
 
         float()
