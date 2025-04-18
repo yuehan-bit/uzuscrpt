@@ -63,7 +63,7 @@ function get_nearest_mob()
     local target = nil
 
     for _, v in workspace.__Main.__Enemies.Server:GetDescendants() do
-        local mag = v:IsA("Part") and not v:GetAttribute("Dead") and get_distance(v:GetPivot().p)
+        local mag = v:IsA("Part") and v:GetAttribute("Scale") == 1 and not v:GetAttribute("Dead") and get_distance(v:GetPivot().p)
 
         if mag and mag < dist then
             dist = mag
