@@ -207,8 +207,6 @@ local function autoRejoin()
     end)
 end
 
-
-
 task.wait(.1)
 load()
 
@@ -256,36 +254,12 @@ main_folder:AddSlider({
     end
 })
 
-misc_folder:AddToggle({text = "Auto Upgrade Weapon", state = config.auto_upgrade_weapon, callback = function(v)
-    config.auto_upgrade_weapon = v
+misc_folder:AddToggle({text = "Auto Execute", state = config.auto_execute, callback = function(v)
+    config.auto_execute = v
     save()
-    task.spawn(auto_upgrade_weapon)
+    if not v then return end
+    queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/yuehan-bit/uzuscrpt/refs/heads/main/uzuscrpt.lua"))()')
 end})
-
-misc_folder:AddToggle({
-    text = "Auto Execute",
-    state = config.auto_execute,
-    callback = function(v)
-        config.auto_execute = v
-        save()
-        if not v then return end
-
-        local scriptToLoad = [[
-            if not getgenv().UzuGUI_Loaded then
-                getgenv().UzuGUI_Loaded = true
-                loadstring(game:HttpGet("https://raw.githubusercontent.com/uzu01/uzu/refs/heads/main/arise.lua"))()
-            end
-        ]]
-
-        if syn and syn.queue_on_teleport then
-            syn.queue_on_teleport(scriptToLoad)
-        elseif queue_on_teleport then
-            queue_on_teleport(scriptToLoad)
-        else
-            warn("⚠️ queue_on_teleport not supported!")
-        end
-    end
-})
 
 misc_folder:AddBind({text = "Toggle GUI", key = "LeftControl", callback = function()
     library:Close()
