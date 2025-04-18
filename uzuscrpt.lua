@@ -186,17 +186,17 @@ end
 
 function auto_farm_mob()
 	while task.wait() and config.auto_farm_mob do
-        local mob = get_nearest_mob()
-        if not mob then continue end
+        local nmob = get_nearest_mob()
+        if not nmob then continue end
 
         float()
 
-        if get_distance(mob:GetPivot().p) > 10 then
-            teleport(mob:GetPivot() * CFrame.new(0, 2, 0.1))
+        if get_distance(nmob:GetPivot().p) > 10 then
+            teleport(nmob:GetPivot() * CFrame.new(0, 2, 0.1))
             task.wait(0.3)
         end
 
-        data_remote_event:FireServer({{Event = "PunchAttack", Enemy = mob.Name}, "\4"})
+        data_remote_event:FireServer({{Event = "PunchAttack", Enemy = nmob.Name}, "\4"})
         task.wait(config.auto_farm_speed or 0.2)
     end
 end
