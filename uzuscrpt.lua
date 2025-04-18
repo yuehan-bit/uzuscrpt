@@ -184,6 +184,23 @@ function auto_farm()
     end
 end
 
+function auto_farm_mob()
+	while task.wait() and config.auto_farm_mob do
+        local mob = get_nearest()
+        if not mob then continue end
+
+        float()
+
+        if get_distance(mob:GetPivot().p) > 10 then
+            teleport(mob:GetPivot() * CFrame.new(0, 2, 0.1))
+            task.wait(0.3)
+        end
+
+        data_remote_event:FireServer({{Event = "PunchAttack", Enemy = mob.Name}, "\4"})
+        task.wait(config.auto_farm_speed or 0.2)
+    end
+end
+
 function auto_rejoin()
     player.OnTeleport:Connect(function(State)
         if State == Enum.TeleportState.Failed or State == Enum.TeleportState.InProgress then
@@ -229,11 +246,18 @@ main_folder:AddList({text = "Select Rune", value = config.selected_rune, values 
     save()
 end})
 
-main_folder:AddToggle({text = "Auto Farm", state = config.auto_farm, callback = function(v)
+main_folder:AddToggle({text = "Auto Farm Brute", state = config.auto_farm, callback = function(v)
     config.auto_farm = v
     save()
     task.spawn(auto_farm)
 end})
+
+main_folder:AddToggle({text = "Auto Farm Mob", state = config.auto_farm_mob, callback = function(v)
+    config.auto_farm_mob = v
+    save()
+    task.spawn(auto_farm_mob)
+end})
+
 
 main_folder:AddSlider({
     text = "Farm Speed (secs)",
