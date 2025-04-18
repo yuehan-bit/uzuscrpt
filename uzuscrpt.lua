@@ -184,44 +184,35 @@ function auto_farm()
     end
 end
 
+local teleportService = game:GetService("TeleportService")
+local player = game.Players.LocalPlayer
+
 local function autoRejoin()
-    -- Prevent duplicate GUIs
-    if getgenv().UzuGUI_Loaded then return end
-    getgenv().UzuGUI_Loaded = true
-
-    -- Clean up GUI before rejoining (if exists)
-    local function cleanup()
-        if library then
-            library:Close()
-            library = nil
-        end
-    end
-
-    -- Teleport failure handler
+    -- Detect teleport failures
     player.OnTeleport:Connect(function(state)
         if state == Enum.TeleportState.Failed then
-            cleanup()
-            task.wait(1) -- Small delay
             teleportService:Teleport(87039211657390, player)
         end
     end)
 
-    -- Disconnection handler
+    -- Detect disconnection errors
     game:GetService("CoreGui").RobloxPromptGui.promptOverlay.ChildAdded:Connect(function(child)
         if child.Name == "ErrorPrompt" and child:FindFirstChild("MessageArea") then
             local errorMsg = child.MessageArea.ErrorMessage.Text:lower()
             if errorMsg:find("disconnected") or errorMsg:find("failed") then
-                cleanup()
-                task.wait(2) -- Delay before rejoining
+                task.wait(2) -- Small delay before rejoining
                 teleportService:Teleport(87039211657390, player)
             end
         end
     end)
 end
+
+
+
 task.wait(.1)
 load()
 
-
+-- Start auto-rejoin (runs once but stays active)
 autoRejoin()
 
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/uzu01/public/main/ui/uwuware"))()
