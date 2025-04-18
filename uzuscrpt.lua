@@ -180,7 +180,7 @@ function auto_farm()
         end
 
         data_remote_event:FireServer({{Event = "PunchAttack", Enemy = mob.Name}, "\4"})
-        task.wait(config.auto_farm_speed or 0.3)
+        task.wait(config.auto_farm_speed or 0.2)
     end
 end
 
@@ -199,31 +199,8 @@ function auto_rejoin()
     end)
 end
 
-function auto_destroy_prompt()
-    local prompts_folder = replicated_storage:WaitForChild("__Assets"):WaitForChild("__Prompts")
-
-    -- Run a listener to watch for prompt changes
-    prompts_folder.ChildAdded:Connect(function(child)
-        if not config.auto_destroy_prompt then return end
-        if child.Name == "Destroy" then
-            task.wait() -- slight delay in case it's not fully replicated yet
-            child:Destroy()
-        end
-    end)
-
-    -- Also destroy existing one if it's already there on start
-    local existing = prompts_folder:FindFirstChild("Destroy")
-    if existing then
-        existing:Destroy()
-    end
-end
-
 task.wait(.1)
 load()
-
-if config.auto_destroy_prompt then
-    task.spawn(auto_destroy_prompt)
-end
 
 if config.auto_rejoin then
     auto_rejoin()
@@ -270,14 +247,6 @@ main_folder:AddSlider({
     end
 })
 
-misc_folder:AddToggle({text = "Auto Destroy Prompt", state = config.auto_destroy_prompt, callback = function(v)
-    config.auto_destroy_prompt = v
-    save()
-    if v then
-        task.spawn(auto_destroy_prompt)
-    end
-end})
-
 misc_folder:AddToggle({text = "Auto Upgrade Weapon", state = config.auto_upgrade_weapon, callback = function(v)
     config.auto_upgrade_weapon = v
     save()
@@ -288,7 +257,7 @@ misc_folder:AddToggle({text = "Auto Execute", state = config.auto_execute, callb
     config.auto_execute = v
     save()
     if not v then return end
-    queue_on_teleport('https://raw.githubusercontent.com/yuehan-bit/uzuscrpt/refs/heads/main/uzuscrpt.lua"))()')
+    queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/uzu01/uzu/refs/heads/main/arise.lua"))()')
 end})
 
 misc_folder:AddToggle({text = "Auto Rejoin", state = config.auto_rejoin, callback = function(v)
