@@ -206,8 +206,14 @@ if config.auto_rejoin then
     auto_rejoin()
 end
 
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/uzu01/public/main/ui/uwuware"))()
-local window = library:CreateWindow("Arise Crossover | Uzu")
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/deividcomsono/Obsidian/refs/heads/main/Library.lua"))()
+local Window = Library:CreateWindow({
+    Title = "My Script",
+    Footer = "v1.0.0",
+    ToggleKeybind = Enum.KeyCode.RightControl,
+    Center = true,
+    AutoShow = true
+})
 
 local main_folder = window:AddFolder("Main")
 local misc_folder = window:AddFolder("Misc")
