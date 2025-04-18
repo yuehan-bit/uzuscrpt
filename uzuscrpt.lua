@@ -250,17 +250,15 @@ local function SetupDisconnectListener()
     end)
 end
 
--- Main setup
-    
-task.wait(.1)
-load()
-
 Player.OnTeleport:Connect(function(state)
     if state == Enum.TeleportState.Failed then
         task.wait(1)
         Rejoin()
     end
 end)
+    
+task.wait(.1)
+load()
 
 SetupDisconnectListener()
 
