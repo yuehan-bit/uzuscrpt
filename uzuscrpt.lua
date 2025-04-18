@@ -183,84 +183,9 @@ function auto_farm()
         task.wait(config.auto_farm_speed or 0.2)
     end
 end
-
--- Prevent duplicate execution
-if getgenv().UltimateAutoRejoinLoaded then return end
-getgenv().UltimateAutoRejoinLoaded = true
-
-local function Rejoin()
-    TeleportService:Teleport((87039211657390, , Player)
-end
-
-local function HandleDisconnection()
-    -- Cleanup existing GUI if needed
-    if getgenv().Library then
-        getgenv().Library:Close()
-        getgenv().Library = nil
-    end
-    
-    -- Auto-execute on rejoin
-    local scriptToLoad = [[
-        if not getgenv().UltimateAutoRejoinLoaded then
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/yuehan-bit/uzuscrpt/refs/heads/main/uzuscrpt.lua"))()
-        end
-    ]]
-    
-    if syn and syn.queue_on_teleport then
-        syn.queue_on_teleport(scriptToLoad)
-    elseif queue_on_teleport then
-        queue_on_teleport(scriptToLoad)
-    end
-end
-
-local function CheckForDisconnectMessage(instance)
-    if instance:IsA("TextLabel") or instance:IsA("TextButton") then
-        local text = string.lower(instance.Text)
-        local disconnectKeywords = {
-            "disconnected", "failed", "error", 
-            "leave", "reconnect", "kick",
-            "banned", "removed", "session"
-        }
-        
-        for _, word in ipairs(disconnectKeywords) do
-            if string.find(text, word) then
-                return true
-            end
-        end
-    end
-    return false
-end
-
-local function SetupDisconnectListener()
-    CoreGui.RobloxPromptGui.promptOverlay.ChildAdded:Connect(function(child)
-        if child.Name == "ErrorPrompt" then
-            -- Wait for UI to fully load
-            task.wait(0.5)
-            
-            -- Search entire prompt for disconnect messages
-            for _, descendant in ipairs(child:GetDescendants()) do
-                if CheckForDisconnectMessage(descendant) then
-                    HandleDisconnection()
-                    task.wait(2) -- Give time to read error
-                    Rejoin()
-                    break
-                end
-            end
-        end
-    end)
-end
-
-Player.OnTeleport:Connect(function(state)
-    if state == Enum.TeleportState.Failed then
-        task.wait(1)
-        Rejoin()
-    end
-end)
     
 task.wait(.1)
 load()
-
-SetupDisconnectListener()
 
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/uzu01/public/main/ui/uwuware"))()
 local window = library:CreateWindow("Arise Crossover | Uzu")
