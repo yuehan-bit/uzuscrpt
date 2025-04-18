@@ -184,17 +184,22 @@ function auto_farm()
     end
 end
 
-function auto_rejoin()
-    player.OnTeleport:Connect(function(State)
-        if State == Enum.TeleportState.Failed or State == Enum.TeleportState.InProgress then
-            teleport_service:Teleport(87039211657390, player)
+local function autoRejoin()
+    -- Detect teleport failures
+    player.OnTeleport:Connect(function(state)
+        if state == Enum.TeleportState.Failed then
+            teleportService:Teleport(87039211657390, player)
         end
     end)
 
+    -- Detect disconnection errors
     game:GetService("CoreGui").RobloxPromptGui.promptOverlay.ChildAdded:Connect(function(child)
-        if child.Name == "ErrorPrompt" then
-            wait(2)
-            teleport_service:Teleport(87039211657390, player)
+        if child.Name == "ErrorPrompt" and child:FindFirstChild("MessageArea") then
+            local errorMsg = child.MessageArea.ErrorMessage.Text:lower()
+            if errorMsg:find("disconnected") or errorMsg:find("failed") then
+                task.wait(2) -- Small delay before rejoining
+                teleportService:Teleport(87039211657390, player)
+            end
         end
     end)
 end
@@ -202,9 +207,8 @@ end
 task.wait(.1)
 load()
 
-if config.auto_rejoin then
-    auto_rejoin()
-end
+
+autoRejoin()
 
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/uzu01/public/main/ui/uwuware"))()
 local window = library:CreateWindow("Arise Crossover | Uzu")
@@ -258,12 +262,6 @@ misc_folder:AddToggle({text = "Auto Execute", state = config.auto_execute, callb
     save()
     if not v then return end
     queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/uzu01/uzu/refs/heads/main/arise.lua"))()')
-end})
-
-misc_folder:AddToggle({text = "Auto Rejoin", state = config.auto_rejoin, callback = function(v)
-    config.auto_rejoin = v
-    save()
-    if v then auto_rejoin() end
 end})
 
 misc_folder:AddBind({text = "Toggle GUI", key = "LeftControl", callback = function()
