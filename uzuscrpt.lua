@@ -185,25 +185,39 @@ function auto_farm()
 end
 
 local function autoRejoin()
-    -- Detect teleport failures
+    -- Prevent duplicate GUIs
+    if getgenv().UzuGUI_Loaded then return end
+    getgenv().UzuGUI_Loaded = true
+
+    -- Clean up GUI before rejoining (if exists)
+    local function cleanup()
+        if library then
+            library:Close()
+            library = nil
+        end
+    end
+
+    -- Teleport failure handler
     player.OnTeleport:Connect(function(state)
         if state == Enum.TeleportState.Failed then
+            cleanup()
+            task.wait(1) -- Small delay
             teleportService:Teleport(87039211657390, player)
         end
     end)
 
-    -- Detect disconnection errors
+    -- Disconnection handler
     game:GetService("CoreGui").RobloxPromptGui.promptOverlay.ChildAdded:Connect(function(child)
         if child.Name == "ErrorPrompt" and child:FindFirstChild("MessageArea") then
             local errorMsg = child.MessageArea.ErrorMessage.Text:lower()
             if errorMsg:find("disconnected") or errorMsg:find("failed") then
-                task.wait(2) -- Small delay before rejoining
+                cleanup()
+                task.wait(2) -- Delay before rejoining
                 teleportService:Teleport(87039211657390, player)
             end
         end
     end)
 end
-
 task.wait(.1)
 load()
 
@@ -257,12 +271,30 @@ misc_folder:AddToggle({text = "Auto Upgrade Weapon", state = config.auto_upgrade
     task.spawn(auto_upgrade_weapon)
 end})
 
-misc_folder:AddToggle({text = "Auto Execute", state = config.auto_execute, callback = function(v)
-    config.auto_execute = v
-    save()
-    if not v then return end
-    queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/uzu01/uzu/refs/heads/main/arise.lua"))()')
-end})
+misc_folder:AddToggle({
+    text = "Auto Execute",
+    state = config.auto_execute,
+    callback = function(v)
+        config.auto_execute = v
+        save()
+        if not v then return end
+
+        local scriptToLoad = [[
+            if not getgenv().UzuGUI_Loaded then
+                getgenv().UzuGUI_Loaded = true
+                loadstring(game:HttpGet("https://raw.githubusercontent.com/uzu01/uzu/refs/heads/main/arise.lua"))()
+            end
+        ]]
+
+        if syn and syn.queue_on_teleport then
+            syn.queue_on_teleport(scriptToLoad)
+        elseif queue_on_teleport then
+            queue_on_teleport(scriptToLoad)
+        else
+            warn("⚠️ queue_on_teleport not supported!")
+        end
+    end
+})
 
 misc_folder:AddBind({text = "Toggle GUI", key = "LeftControl", callback = function()
     library:Close()
