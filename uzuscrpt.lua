@@ -183,9 +183,28 @@ function auto_farm()
         task.wait(config.auto_farm_speed or 0.2)
     end
 end
-    
+
+function auto_rejoin()
+    player.OnTeleport:Connect(function(State)
+        if State == Enum.TeleportState.Failed or State == Enum.TeleportState.InProgress then
+            teleport_service:Teleport(87039211657390, player)
+        end
+    end)
+
+    game:GetService("CoreGui").RobloxPromptGui.promptOverlay.ChildAdded:Connect(function(child)
+        if child.Name == "ErrorPrompt" then
+            wait(2)
+            teleport_service:Teleport(87039211657390, player)
+        end
+    end)
+end
+
 task.wait(.1)
 load()
+
+if config.auto_rejoin then
+    auto_rejoin()
+end
 
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/uzu01/public/main/ui/uwuware"))()
 local window = library:CreateWindow("Arise Crossover | Uzu")
@@ -228,11 +247,23 @@ main_folder:AddSlider({
     end
 })
 
+misc_folder:AddToggle({text = "Auto Upgrade Weapon", state = config.auto_upgrade_weapon, callback = function(v)
+    config.auto_upgrade_weapon = v
+    save()
+    task.spawn(auto_upgrade_weapon)
+end})
+
 misc_folder:AddToggle({text = "Auto Execute", state = config.auto_execute, callback = function(v)
     config.auto_execute = v
     save()
     if not v then return end
     queue_on_teleport('loadstring(game:HttpGet("https://raw.githubusercontent.com/yuehan-bit/uzuscrpt/refs/heads/main/uzuscrpt.lua"))()')
+end})
+
+misc_folder:AddToggle({text = "Auto Rejoin", state = config.auto_rejoin, callback = function(v)
+    config.auto_rejoin = v
+    save()
+    if v then auto_rejoin() end
 end})
 
 misc_folder:AddBind({text = "Toggle GUI", key = "LeftControl", callback = function()
