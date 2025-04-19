@@ -117,7 +117,7 @@ function auto_dungeon()
     while task.wait() and config.auto_dungeon do
         replay_dungeon()
 
-        local mob = get_nearest_mob()
+        local mob = get_nearest_mob() or get_brute()
         if not mob then continue end
 
         float()
