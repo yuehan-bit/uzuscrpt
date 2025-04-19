@@ -49,8 +49,9 @@ local function antiKick()
     print("[Anti-Kick] Nudged character.")
 end
 
--- Run every 15 minutes
+-- Run every 15 minutes (set to 5 for testing)
 local interval = 900 -- seconds (900 = 15 minutes)
+-- interval = 5 -- Uncomment this line for fast testing
 
 task.spawn(function()
     while true do
