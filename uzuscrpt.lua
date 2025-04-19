@@ -231,6 +231,40 @@ function auto_rejoin()
     end)
 end
 
+-- Reference spawn folder
+local spawnsFolder = workspace:WaitForChild("__Extra"):WaitForChild("__Spawns")
+
+-- Grab available spawns
+local spawnList = {}
+local spawnNames = {}
+
+for _, obj in ipairs(spawnsFolder:GetChildren()) do
+    if obj:IsA("BasePart") then
+        spawnList[obj.Name] = obj
+        table.insert(spawnNames, obj.Name)
+    end
+end
+
+-- Default values
+local teleportToSpawnEnabled = false
+local selectedSpawn = nil
+
+-- Enable/disable teleport
+function toggleTeleportToSpawn(state)
+    teleportToSpawnEnabled = state
+end
+
+-- Set and teleport to selected spawn
+function setSelectedSpawn(spawn)
+    selectedSpawn = spawn
+    if teleportToSpawnEnabled and selectedSpawn then
+        local character = player.Character
+        if not character then return end
+        character:SetAttribute("InTp", true)
+        character:PivotTo(selectedSpawn.CFrame)
+    end
+end
+
 task.wait(.1)
 load()
 
@@ -243,6 +277,20 @@ local window = library:CreateWindow("Arise Crossover | Uzu")
 
 local main_folder = window:AddFolder("Main")
 local misc_folder = window:AddFolder("Misc")
+local tp_folder = window:AddFolder("Teleport")
+
+tp_folder:AddList({ 
+    text = "Select World",
+    value = spawnNames[1],
+    values = spawnNames,
+    callback = function(name)
+        local spawn = spawnList[name]
+        if spawn then
+            toggleTeleportToSpawn(true)
+            setSelectedSpawn(spawn)
+        end
+    end
+})
 
 main_folder:AddToggle({text = "Auto Dungeon", state = config.auto_dungeon, callback = function(v)
     config.auto_dungeon = v
