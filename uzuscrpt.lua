@@ -34,26 +34,32 @@ function teleport(position)
     character:PivotTo(position)
 end
 
-local movement_interval = 3 -- 15 minutes in seconds
-local movement_amount = 0.5   -- How far the player moves
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
 
--- Function to simulate a tiny movement
-local function nudge()
-    local char = player.Character
-    local root = char and char:FindFirstChild("HumanoidRootPart")
+-- Anti-kick movement function
+local function antiKick()
+    local char = player.Character or player.CharacterAdded:Wait()
+    local root = char:WaitForChild("HumanoidRootPart", 5)
     if not root then return end
 
-    local original_pos = root.Position
-    root.CFrame = root.CFrame * CFrame.new(0, 0, movement_amount)
-    task.wait(0.1)
-    root.CFrame = CFrame.new(original_pos)
+    -- Slight move forward and back
+    local originalCFrame = root.CFrame
+    root.CFrame = originalCFrame * CFrame.new(0, 0, 0.5)
+    task.wait(0.2)
+    root.CFrame = originalCFrame
+
+    print("[Anti-Kick] Nudged character.")
 end
 
--- Start anti-kick loop
+-- Run every 15 minutes (set to 5 for testing)
+local interval = 2 -- seconds (900 = 15 minutes)
+-- interval = 5 -- Uncomment this line for fast testing
+
 task.spawn(function()
     while true do
-        task.wait(movement_interval)
-        nudge()
+        antiKick()
+        task.wait(interval)
     end
 end)
 
