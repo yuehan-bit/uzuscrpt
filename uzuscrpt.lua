@@ -34,9 +34,6 @@ function teleport(position)
     character:PivotTo(position)
 end
 
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-
 -- Anti-kick movement function
 local function antiKick()
     local char = player.Character or player.CharacterAdded:Wait()
@@ -53,7 +50,7 @@ local function antiKick()
 end
 
 -- Run every 15 minutes (set to 5 for testing)
-local interval = 2 -- seconds (900 = 15 minutes)
+local interval = 0 -- seconds (900 = 15 minutes)
 -- interval = 5 -- Uncomment this line for fast testing
 
 task.spawn(function()
@@ -304,7 +301,6 @@ end
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/uzu01/public/main/ui/uwuware"))()
 local window = library:CreateWindow("Arise Crossover | Uzu")
 
-local antiKick = window:AddFolder("Anti kick is ON")
 local main_folder = window:AddFolder("Main")
 local misc_folder = window:AddFolder("Misc")
 local tp_folder = window:AddFolder("Teleport")
@@ -321,6 +317,8 @@ tp_folder:AddList({
         end
     end
 })
+
+main_folder:AddLabel("Anti Kick is ON")
 
 main_folder:AddToggle({text = "Auto Dungeon", state = config.auto_dungeon, callback = function(v)
     config.auto_dungeon = v
