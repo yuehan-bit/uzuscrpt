@@ -302,8 +302,9 @@ if config.auto_rejoin then
 end
 
 local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/uzu01/public/main/ui/uwuware"))()
-local window = library:CreateWindow("Arise Crossover | Uzu : Anti kick always ON")
+local window = library:CreateWindow("Arise Crossover | Uzu")
 
+local antiKick = window:AddFolder("Anti kick is ON")
 local main_folder = window:AddFolder("Main")
 local misc_folder = window:AddFolder("Misc")
 local tp_folder = window:AddFolder("Teleport")
