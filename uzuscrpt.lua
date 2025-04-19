@@ -117,7 +117,7 @@ function auto_dungeon()
     while task.wait() and config.auto_dungeon do
         replay_dungeon()
 
-        local mob = get_nearest_mob() or get_brute()
+        local mob = get_mob()
         if not mob then continue end
 
         float()
@@ -158,6 +158,21 @@ function get_brute()
 
     for i, v in workspace.__Main.__Enemies.Server:GetDescendants() do
         local mag = v:IsA("Part") and v:GetAttribute("Scale") == 2 and not v:GetAttribute("Dead") and get_distance(v:GetPivot().p)
+
+        if mag and mag < dist then
+            dist = mag
+            target = v
+        end
+    end
+    return target
+end
+
+function get_mob()
+    local dist = math.huge
+    local target = nil
+
+    for _, v in workspace.__Main.__Enemies.Server:GetDescendants() do
+        local mag = v:IsA("Part") and not v:GetAttribute("Dead") and get_distance(v:GetPivot().p)
 
         if mag and mag < dist then
             dist = mag
