@@ -383,6 +383,8 @@ misc_folder:AddBind({text = "Toggle GUI", key = "LeftControl", callback = functi
     library:Close()
 end})
 
+misc_folder:AddLabel("Anti Kick is ON")
+
 library:Init()
 
 -- Setup Teleport to Spawn logic
