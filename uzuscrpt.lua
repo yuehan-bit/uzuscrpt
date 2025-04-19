@@ -34,7 +34,7 @@ function teleport(position)
     character:PivotTo(position)
 end
 
-local movement_interval = 1 -- 15 minutes in seconds
+local movement_interval = 3 -- 15 minutes in seconds
 local movement_amount = 0.5   -- How far the player moves
 
 -- Function to simulate a tiny movement
