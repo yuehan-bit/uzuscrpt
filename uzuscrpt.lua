@@ -358,3 +358,31 @@ misc_folder:AddBind({text = "Toggle GUI", key = "LeftControl", callback = functi
 end})
 
 library:Init()
+
+-- Setup Teleport to Spawn logic
+local spawnsFolder = workspace:WaitForChild("__Extra"):FindFirstChild("__Spawns")
+if spawnsFolder then
+    local spawnList = {}
+    local spawnNames = {}
+
+    for _, obj in ipairs(spawnsFolder:GetChildren()) do
+        if obj:IsA("BasePart") then
+            spawnList[obj.Name] = obj
+            table.insert(spawnNames, obj.Name)
+        end
+    end
+
+    main_folder:AddList({ 
+        text = "Teleport to World",
+        value = spawnNames[1],
+        values = spawnNames,
+        callback = function(name)
+            local spawn = spawnList[name]
+            if spawn then
+                teleport(spawn.CFrame)
+            end
+        end
+    })
+else
+    warn("No '__Spawns' folder found in workspace.__Extra")
+end
