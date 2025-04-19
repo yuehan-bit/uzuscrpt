@@ -50,7 +50,7 @@ local function antiKick()
 end
 
 -- Run every 15 minutes (set to 5 for testing)
-local interval = 900 -- seconds (900 = 15 minutes)
+local interval = 5 -- seconds (900 = 15 minutes)
 -- interval = 5 -- Uncomment this line for fast testing
 
 task.spawn(function()
