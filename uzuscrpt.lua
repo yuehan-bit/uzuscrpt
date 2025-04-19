@@ -58,21 +58,6 @@ function float()
     root_part.Velocity = Vector3.zero
 end
 
-function get_nearest_mob()
-    local dist = math.huge
-    local target = nil
-
-    for _, v in workspace.__Main.__Enemies.Server:GetDescendants() do
-        local mag = v:IsA("Part") and v:GetAttribute("Scale") == 1 and not v:GetAttribute("Dead") and get_distance(v:GetPivot().p)
-
-        if mag and mag < dist then
-            dist = mag
-            target = v
-        end
-    end
-    return target
-end
-
 function get_weapons()
     local weapons = {}
 
@@ -117,7 +102,7 @@ function auto_dungeon()
     while task.wait() and config.auto_dungeon do
         replay_dungeon()
 
-        local mob = get_mob()
+        local mob = get_nearest_mob()
         if not mob then continue end
 
         float()
@@ -167,12 +152,27 @@ function get_brute()
     return target
 end
 
-function get_mob()
+function get_normal_mob()
     local dist = math.huge
     local target = nil
 
     for _, v in workspace.__Main.__Enemies.Server:GetDescendants() do
-        local mag = v:IsA("Part") and not v:GetAttribute("Dead") and get_distance(v:GetPivot().p)
+        local mag = v:IsA("Part") and v:GetAttribute("Scale") == 1 and not v:GetAttribute("Dead") and get_distance(v:GetPivot().p)
+
+        if mag and mag < dist then
+            dist = mag
+            target = v
+        end
+    end
+    return target
+end
+
+function get_nearest_mob()
+    local dist = math.huge
+    local target = nil
+
+    for _, v in workspace.__Main.__Enemies.Server:GetDescendants() do
+        local mag = v:IsA("Part") and v:GetAttribute("Scale") and not v:GetAttribute("Dead") and get_distance(v:GetPivot().p)
 
         if mag and mag < dist then
             dist = mag
@@ -201,7 +201,7 @@ end
 
 function auto_farm_mob()
 	while task.wait() and config.auto_farm_mob do
-        local nmob = get_nearest_mob()
+        local nmob = get_normal_mob()
         if not nmob then continue end
 
         float()
