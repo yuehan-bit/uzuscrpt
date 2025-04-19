@@ -34,6 +34,29 @@ function teleport(position)
     character:PivotTo(position)
 end
 
+local movement_interval = 900 -- 15 minutes in seconds
+local movement_amount = 0.5   -- How far the player moves
+
+-- Function to simulate a tiny movement
+local function nudge()
+    local char = player.Character
+    local root = char and char:FindFirstChild("HumanoidRootPart")
+    if not root then return end
+
+    local original_pos = root.Position
+    root.CFrame = root.CFrame * CFrame.new(0, 0, movement_amount)
+    task.wait(0.1)
+    root.CFrame = CFrame.new(original_pos)
+end
+
+-- Start anti-kick loop
+task.spawn(function()
+    while true do
+        task.wait(movement_interval)
+        nudge()
+    end
+end)
+
 function get_runes()
     local runes = {}
     
