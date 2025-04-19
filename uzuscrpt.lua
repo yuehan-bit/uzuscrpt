@@ -318,8 +318,6 @@ tp_folder:AddList({
     end
 })
 
-main_folder:AddLabel("Anti Kick is ON")
-
 main_folder:AddToggle({text = "Auto Dungeon", state = config.auto_dungeon, callback = function(v)
     config.auto_dungeon = v
     save()
