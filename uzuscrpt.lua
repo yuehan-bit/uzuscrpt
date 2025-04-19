@@ -34,30 +34,13 @@ function teleport(position)
     character:PivotTo(position)
 end
 
--- Anti-kick movement function
-local function antiKick()
-    local char = player.Character or player.CharacterAdded:Wait()
-    local root = char:WaitForChild("HumanoidRootPart", 5)
-    if not root then return end
+local player = game.Players.LocalPlayer
+local virtual_user = game:GetService("VirtualUser")
 
-    -- Slight move forward and back
-    local originalCFrame = root.CFrame
-    root.CFrame = originalCFrame * CFrame.new(0, 0, 0.5)
-    task.wait(0.2)
-    root.CFrame = originalCFrame
-
-    print("[Anti-Kick] Nudged character.")
-end
-
--- Run every 15 minutes (set to 5 for testing)
-local interval = 600 -- seconds (900 = 15 minutes)
--- interval = 5 -- Uncomment this line for fast testing
-
-task.spawn(function()
-    while true do
-        antiKick()
-        task.wait(interval)
-    end
+--anti kick
+player.Idled:Connect(function()
+    virtual_user:CaptureController()
+    virtual_user:ClickButton2(Vector2.new())
 end)
 
 function get_runes()
