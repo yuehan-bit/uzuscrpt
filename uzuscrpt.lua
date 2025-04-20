@@ -208,7 +208,7 @@ function auto_farm()
     end
 end
 
-function auto_farm_castle()
+function auto_farm_all()
 	while task.wait() and config.auto_farm_castle do
         local cmob = get_nearest_mob()
         if not cmob then continue end
