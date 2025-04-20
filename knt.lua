@@ -67,25 +67,23 @@ function float()
     root_part.Velocity = Vector3.zero
 end
 
-function replay_dungeon()
-    local ticket = player.leaderstats.Inventory.Items:FindFirstChild("Ticket")
-    local ticket_amount = ticket and ticket:GetAttribute("Amount")
-    getgenv().old_ticket = old_ticket or ticket_amount or 0
-
-    if old_ticket ~= ticket_amount or not replicated_storage:GetAttribute("Dungeon") then
-        for i, v in ctrl_char do
-            data_remote_event:FireServer({{Type = "Gems", Event = "DungeonAction", Action = "BuyTicket"}, v})
-            data_remote_event:FireServer({{Event = "DungeonAction", Action = "Create"}, v})
-
-            if config.use_rune and config.selected_rune then
-                data_remote_event:FireServer({{Dungeon = player.UserId, Action = "AddItems", Slot = 1, Event = "DungeonAction",
-                Item = config.selected_rune}, v})
-                task.wait(.1)
-            end
-
-            data_remote_event:FireServer({{Dungeon = player.UserId, Event = "DungeonAction", Action = "Start"}, v})
+function auto_replay()
+    while task.wait() and config.auto_replay do
+        if not replicated_storage:GetAttribute("Dungeon") then continue end
+        local dungeon_message = replicated_storage:GetAttribute("DungeonMessage")
+        local dungeon_end = dungeon_message and dungeon_message:match("Ends")
+        local seconds_left = dungeon_message and tonumber(dungeon_message:match("%d+"))
+    
+        local ticket_amount = player.leaderstats.Inventory.Items.Ticket:GetAttribute("Amount")
+        local boss_dead = is_boss_dead()
+        getgenv().old_ticket = old_ticket or ticket_amount
+    
+        if dungeon_end and seconds_left <= 12 or not config.wait_double_dungeon and boss_dead then
+            if boss_dead then print("chill"); task.wait(3) end
+            start_dungeon()
+            send_drops()
+            task.wait(9e9)
         end
-        task.wait(10)
     end
 end
 
@@ -265,22 +263,28 @@ function join_castle()
     end
 end
 
-function auto_farm_castle()
-	while task.wait() and config.auto_farm_castle do
-        join_castle()
+function auto_castle()
+    while task.wait() and config.auto_castle do
+        local minute = os.date("*t").min
 
-        local cmob = get_nearest_mob()
-        if not cmob then continue end
+        if replicated_storage:GetAttribute("IsCastle") then 
+            local castle_room = replicated_storage:GetAttribute("CurrentRoom")
 
-        float()
-
-        if get_distance(cmob:GetPivot().p) > 10 then
-            teleport(cmob:GetPivot() * CFrame.new(0, 2, 0.1))
-            task.wait(0.3)
+            if castle_room and castle_room > (config.leave_after_floor or 100) and minute >= 45 and minute <= 57 then
+                send_drops()
+                player:Kick("rejoining, player has reached the floor limit")
+                rejoin(87039211657390)
+                task.wait(1)
+            end    
+            continue 
         end
-
-        data_remote_event:FireServer({{Event = "PunchAttack", Enemy = cmob.Name}, "\4"})
-        task.wait(config.auto_farm_speed or 0.2)
+        
+        if minute >= 45 and minute <= 57 then
+            fire_remote({Event = "CastleAction", Action = "BuyTicket", Type = "Gems"}, nil, "GENERAL_EVENT")
+            task.wait(0.5)
+            fire_remote({Event = "CastleAction", Action = "Join", Check = config.auto_skip_floor}, nil, "GENERAL_EVENT")
+            task.wait(1)
+        end
     end
 end
 
@@ -441,15 +445,21 @@ GeneralTab:AddToggle("AutoArise", {
     end
 })
 
-CastleTab:AddToggle("AutoFarmCastle", {
-    Text = "Auto Farm Castle",
-    Default = config.auto_farm_castle,
+CastleTab:AddToggle("AutoCastle", {
+    Text = "Auto Castle",
+    Default = config.auto_castle,
     Callback = function(v)
-        config.auto_farm_castle = v
+        config.auto_castle = v
         save()
-        task.spawn(auto_farm_castle)
+        task.spawn(auto_castle)
     end
 })
+
+CastleTab:AddToggle("", {Text = "Auto Skip Floor", Default = config.auto_skip_floor, Callback = function(v)
+    config.auto_skip_floor = v
+    save()
+end})
+
 
 GeneralTab:AddToggle("AutoFarmMob", {
     Text = "Auto Farm Mob",
