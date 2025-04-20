@@ -362,8 +362,6 @@ misc_folder:AddToggle({text = "Auto Rejoin", state = config.auto_rejoin, callbac
     if v then auto_rejoin() end
 end})
 
-misc_folder:AddLabel({text "🛡️ Anti Kick: Active"})
-
 misc_folder:AddBind({text = "Toggle GUI", key = "LeftControl", callback = function()
     library:Close()
 end})
