@@ -215,12 +215,12 @@ function auto_farm_castle()
 
         float()
 
-        if get_distance(nmob:GetPivot().p) > 10 then
+        if get_distance(cmob:GetPivot().p) > 10 then
             teleport(cmob:GetPivot() * CFrame.new(0, 2, 0.1))
             task.wait(0.3)
         end
 
-        data_remote_event:FireServer({{Event = "PunchAttack", Enemy = nmob.Name}, "\4"})
+        data_remote_event:FireServer({{Event = "PunchAttack", Enemy = cmob.Name}, "\4"})
         task.wait(config.auto_farm_speed or 0.2)
     end
 end
