@@ -67,24 +67,6 @@ function float()
     root_part.Velocity = Vector3.zero
 end
 
-function get_weapons()
-    local weapons = {}
-
-    for _, v in player.leaderstats.Inventory.Weapons:GetChildren() do
-        local weapon_name = v:GetAttribute("Name")
-        local weapon_rank = v:GetAttribute("Level")
-
-        if v:GetAttribute("Locked") then continue end
-        if player.leaderstats.Equips:GetAttribute("Weapon") == v.Name then continue end
-        if weapon_name == "DualCrystalSword" then continue end
-
-        weapons[weapon_name] = weapons[weapon_name] or {}
-        weapons[weapon_name][weapon_rank] = weapons[weapon_name][weapon_rank] or {}
-        table.insert(weapons[weapon_name][weapon_rank], v.Name)
-    end
-    return weapons
-end
-
 function replay_dungeon()
     local ticket = player.leaderstats.Inventory.Items:FindFirstChild("Ticket")
     local ticket_amount = ticket and ticket:GetAttribute("Amount")
@@ -123,6 +105,24 @@ function auto_dungeon()
 
         data_remote_event:FireServer({{Event = "PunchAttack", Enemy = mob.Name}, "\4"})
     end
+end
+
+function get_weapons()
+    local weapons = {}
+
+    for _, v in player.leaderstats.Inventory.Weapons:GetChildren() do
+        local weapon_name = v:GetAttribute("Name")
+        local weapon_rank = v:GetAttribute("Level")
+
+        if v:GetAttribute("Locked") then continue end
+        if player.leaderstats.Equips:GetAttribute("Weapon") == v.Name then continue end
+        if weapon_name == "DualCrystalSword" then continue end
+
+        weapons[weapon_name] = weapons[weapon_name] or {}
+        weapons[weapon_name][weapon_rank] = weapons[weapon_name][weapon_rank] or {}
+        table.insert(weapons[weapon_name][weapon_rank], v.Name)
+    end
+    return weapons
 end
 
 function auto_upgrade_weapon()
@@ -207,6 +207,24 @@ function auto_farm()
         task.wait(config.auto_farm_speed or 0.2)
     end
 end
+
+function auto_farm_castle()
+	while task.wait() and config.auto_farm_castle do
+        local cmob = get_nearest_mob()
+        if not cmob then continue end
+
+        float()
+
+        if get_distance(nmob:GetPivot().p) > 10 then
+            teleport(cmob:GetPivot() * CFrame.new(0, 2, 0.1))
+            task.wait(0.3)
+        end
+
+        data_remote_event:FireServer({{Event = "PunchAttack", Enemy = nmob.Name}, "\4"})
+        task.wait(config.auto_farm_speed or 0.2)
+    end
+end
+
 
 function auto_farm_mob()
 	while task.wait() and config.auto_farm_mob do
@@ -316,6 +334,12 @@ main_folder:AddList({text = "Select Rune", value = config.selected_rune, values 
     callback = function(v)
     config.selected_rune = v
     save()
+end})
+
+main_folder:AddToggle({text = "Auto Farm Castle", state = config.auto_farm_castle, callback = function(v)
+    config.auto_farm_castle = v
+    save()
+    task.spawn(auto_farm_castle)
 end})
 
 main_folder:AddToggle({text = "Auto Farm Brute", state = config.auto_farm, callback = function(v)
